@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Hash, Star, Users, Search, Info, Smile, AtSign, Send, Bold, Italic, Link2, ListOrdered, Code, Menu } from 'lucide-react';
+import { Hash, Star, Users, Search, Info, AtSign, Send, Bold, Italic, ListOrdered, Menu } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useChannels } from '@/hooks/useChannels';
 import { useMessages } from '@/hooks/useMessages';
@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChannelWelcome } from './ChannelWelcome';
 import { MessageItem } from './MessageItem';
 import { FileUpload } from './FileUpload';
+import { EmojiPicker } from './EmojiPicker';
 
 export const MessageArea = () => {
   const { activeChannel, toggleSidebar, sidebarCollapsed } = useWorkspaceStore();
@@ -18,6 +19,7 @@ export const MessageArea = () => {
   const { messages, loading, sendMessage } = useMessages(activeChannel);
   const [messageInput, setMessageInput] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const channel = channels.find((c) => c.id === activeChannel);
 
@@ -37,6 +39,35 @@ export const MessageArea = () => {
 
   const handleFileRemove = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const insertFormatting = (before: string, after: string = before) => {
+    if (!inputRef.current) return;
+    
+    const start = inputRef.current.selectionStart;
+    const end = inputRef.current.selectionEnd;
+    const text = messageInput;
+    const selectedText = text.substring(start, end);
+    
+    const newText = text.substring(0, start) + before + selectedText + after + text.substring(end);
+    setMessageInput(newText);
+    
+    setTimeout(() => {
+      inputRef.current?.focus();
+      const newPos = start + before.length + selectedText.length + after.length;
+      inputRef.current?.setSelectionRange(newPos, newPos);
+    }, 0);
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    const cursorPos = inputRef.current?.selectionStart || messageInput.length;
+    const newText = messageInput.slice(0, cursorPos) + emoji + messageInput.slice(cursorPos);
+    setMessageInput(newText);
+    setTimeout(() => {
+      inputRef.current?.focus();
+      const newPos = cursorPos + emoji.length;
+      inputRef.current?.setSelectionRange(newPos, newPos);
+    }, 0);
   };
 
   if (!channel) {
@@ -145,27 +176,58 @@ export const MessageArea = () => {
           <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             {/* Formatting Toolbar */}
             <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-border">
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 hover:bg-muted"
+                onClick={() => insertFormatting('**')}
+                title="Bold"
+              >
                 <Bold className="h-3.5 w-3.5" />
               </Button>
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 hover:bg-muted"
+                onClick={() => insertFormatting('_')}
+                title="Italic"
+              >
                 <Italic className="h-3.5 w-3.5" />
               </Button>
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-                <Link2 className="h-3.5 w-3.5" />
-              </Button>
-              <div className="w-px h-4 bg-border mx-1" />
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 hover:bg-muted"
+                onClick={() => {
+                  const lines = messageInput.split('\n');
+                  const newText = lines.map(line => line.trim() ? `• ${line}` : line).join('\n');
+                  setMessageInput(newText);
+                }}
+                title="Bulleted list"
+              >
                 <ListOrdered className="h-3.5 w-3.5" />
               </Button>
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-                <Code className="h-3.5 w-3.5" />
-              </Button>
               <div className="flex-1" />
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
-                <Smile className="h-3.5 w-3.5" />
-              </Button>
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted">
+              <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 hover:bg-muted"
+                onClick={() => {
+                  const cursorPos = inputRef.current?.selectionStart || 0;
+                  const newText = messageInput.slice(0, cursorPos) + '@' + messageInput.slice(cursorPos);
+                  setMessageInput(newText);
+                  setTimeout(() => {
+                    inputRef.current?.focus();
+                    inputRef.current?.setSelectionRange(cursorPos + 1, cursorPos + 1);
+                  }, 0);
+                }}
+                title="Mention someone"
+              >
                 <AtSign className="h-3.5 w-3.5" />
               </Button>
               <FileUpload
@@ -177,24 +239,25 @@ export const MessageArea = () => {
 
             {/* Input Field */}
             <div className="relative">
-              <input
-                type="text"
+              <textarea
+                ref={inputRef}
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 placeholder={`Message #${channel.name}`}
-                className="w-full px-3 py-3 bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground"
+                className="w-full px-3 py-3 bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground resize-none min-h-[60px] max-h-[200px]"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     handleSendMessage(e);
                   }
                 }}
+                rows={1}
               />
               {messageInput && (
                 <Button
                   type="submit"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-primary hover:bg-primary/90 rounded"
+                  className="absolute right-2 bottom-2 h-8 w-8 bg-primary hover:bg-primary/90 rounded"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

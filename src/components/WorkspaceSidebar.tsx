@@ -9,6 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AddChannelDialog } from './AddChannelDialog';
+import { AddDMDialog } from './AddDMDialog';
 
 export const WorkspaceSidebar = () => {
   const { activeChannel, setActiveChannel, sidebarCollapsed, toggleSidebar } = useWorkspaceStore();
@@ -16,6 +18,8 @@ export const WorkspaceSidebar = () => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile(user?.id);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const [showAddChannel, setShowAddChannel] = useState(false);
+  const [showAddDM, setShowAddDM] = useState(false);
   const navigate = useNavigate();
 
   // Set first channel as active on mount
@@ -84,12 +88,6 @@ export const WorkspaceSidebar = () => {
           <ChevronDown className="h-4 w-4" />
         </Button>
 
-        {/* Trial Banner */}
-        <div className="mt-2 px-2 py-1.5 bg-[hsl(var(--slack-aubergine))] rounded flex items-center gap-2 cursor-pointer hover:bg-[hsl(var(--slack-aubergine))]/80">
-          <Settings className="h-3.5 w-3.5 text-[hsl(var(--slack-text-secondary))]" />
-          <span className="text-xs text-[hsl(var(--slack-text-secondary))]">30 days left in trial</span>
-          <ChevronDown className="h-3 w-3 text-[hsl(var(--slack-text-secondary))] ml-auto" />
-        </div>
       </div>
 
       {/* Navigation */}
@@ -160,7 +158,19 @@ export const WorkspaceSidebar = () => {
                   )}
                   <span>{section}</span>
                 </div>
-                <Plus className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (section === 'Direct messages') {
+                      setShowAddDM(true);
+                    } else {
+                      setShowAddChannel(true);
+                    }
+                  }}
+                  className="opacity-0 group-hover:opacity-100"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
               </button>
               {!collapsedSections[section] && (
                 <div className="space-y-0.5 mt-0.5">
@@ -188,9 +198,12 @@ export const WorkspaceSidebar = () => {
                       <span className="flex-1 text-left truncate">{channel.name}</span>
                     </button>
                   ))}
-                  <button className="w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-[hsl(var(--slack-text-secondary))]">
+                  <button 
+                    onClick={() => section === 'Direct messages' ? setShowAddDM(true) : setShowAddChannel(true)}
+                    className="w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-[hsl(var(--slack-text-secondary))]"
+                  >
                     <Plus className="h-4 w-4" />
-                    <span>Add channels</span>
+                    <span>Add {section === 'Direct messages' ? 'teammates' : 'channels'}</span>
                   </button>
                 </div>
               )}
@@ -248,6 +261,9 @@ export const WorkspaceSidebar = () => {
           </Button>
         </div>
       </div>
+      
+      <AddChannelDialog open={showAddChannel} onOpenChange={setShowAddChannel} />
+      <AddDMDialog open={showAddDM} onOpenChange={setShowAddDM} />
     </motion.aside>
   );
 };
