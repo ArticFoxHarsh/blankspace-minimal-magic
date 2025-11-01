@@ -6,6 +6,7 @@ export interface Channel {
   type: 'channel' | 'dm';
   unread?: number;
   section?: string;
+  description?: string;
 }
 
 export interface Message {
@@ -17,6 +18,7 @@ export interface Message {
   timestamp: Date;
   channelId: string;
   reactions?: { emoji: string; count: number; users: string[] }[];
+  threadCount?: number;
 }
 
 interface WorkspaceStore {
@@ -33,9 +35,27 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
   activeChannel: 'new-channel',
   sidebarCollapsed: false,
   channels: [
-    { id: 'new-channel', name: 'new-channel', type: 'channel', section: 'Channels' },
-    { id: 'all-new-workspace', name: 'all-new-workspace', type: 'channel', section: 'Channels' },
-    { id: 'social', name: 'social', type: 'channel', section: 'Channels' },
+    { 
+      id: 'new-channel', 
+      name: 'new-channel', 
+      type: 'channel', 
+      section: 'Channels',
+      description: 'This channel is for everything #new-channel. Hold meetings, share docs and make decisions together with your team.'
+    },
+    { 
+      id: 'all-new-workspace', 
+      name: 'all-new-workspace', 
+      type: 'channel', 
+      section: 'Channels',
+      description: 'Share announcements and updates about company news, upcoming events or teammates who deserve some kudos.'
+    },
+    { 
+      id: 'social', 
+      name: 'social', 
+      type: 'channel', 
+      section: 'Channels',
+      description: 'Other channels are for work. This one\'s just for fun. Get to know your teammates and show your lighter side.'
+    },
     { id: 'avi-dm', name: 'Avi', type: 'dm', section: 'Direct messages' },
   ],
   messages: [
@@ -45,8 +65,40 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
       userName: 'Avi',
       userAvatar: '👤',
       content: 'joined #new-channel.',
-      timestamp: new Date('2024-01-01T19:23:00'),
+      timestamp: new Date(Date.now() - 3600000),
       channelId: 'new-channel',
+    },
+    {
+      id: '2',
+      userId: 'avi',
+      userName: 'Avi',
+      userAvatar: '👤',
+      content: 'Hey everyone! Welcome to the new channel. Let\'s collaborate on this project together! 🚀',
+      timestamp: new Date(Date.now() - 3000000),
+      channelId: 'new-channel',
+      reactions: [
+        { emoji: '👍', count: 3, users: ['user1', 'user2', 'user3'] },
+        { emoji: '🎉', count: 2, users: ['user1', 'user2'] },
+      ],
+    },
+    {
+      id: '3',
+      userId: 'avi',
+      userName: 'Avi',
+      userAvatar: '👤',
+      content: 'Just pushed some updates to the docs. Take a look when you get a chance!',
+      timestamp: new Date(Date.now() - 1800000),
+      channelId: 'new-channel',
+      threadCount: 3,
+    },
+    {
+      id: '4',
+      userId: 'system',
+      userName: 'Avi',
+      userAvatar: '👤',
+      content: 'joined #social.',
+      timestamp: new Date(Date.now() - 7200000),
+      channelId: 'social',
     },
   ],
   setActiveChannel: (channelId) => set({ activeChannel: channelId }),
