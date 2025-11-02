@@ -293,20 +293,14 @@ export const WorkspaceSidebar = () => {
             <Button
               variant="ghost"
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px] h-auto justify-start font-normal transition-all"
-              onClick={() => navigate('/activity')}
-            >
-              <Bell className="h-4 w-4" />
-              <span>Activity</span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded hover:bg-[hsl(var(--slack-purple-hover))] text-[hsl(var(--slack-text-secondary))] text-[15px] h-auto justify-start font-normal transition-all"
               onClick={() => navigate('/starred')}
             >
               <Star className="h-4 w-4" />
               <span>Starred</span>
             </Button>
           </div>
+
+          <div className="border-t border-[hsl(var(--slack-purple-active))] mb-3" />
 
           {/* Huddles */}
           <div className="mb-3">
@@ -329,6 +323,8 @@ export const WorkspaceSidebar = () => {
               <span>Directories</span>
             </Button>
           </div>
+
+          <div className="border-t border-[hsl(var(--slack-purple-active))] mb-3" />
 
           {/* Sections */}
           {Object.entries(channelsBySection).map(([section, sectionChannels]) => (

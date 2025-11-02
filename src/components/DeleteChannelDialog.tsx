@@ -31,6 +31,18 @@ export const DeleteChannelDialog = ({
 
   const handleDelete = async () => {
     try {
+      // First delete all messages in the channel
+      const { error: messagesError } = await supabase
+        .from('messages')
+        .delete()
+        .eq('channel_id', channelId);
+
+      if (messagesError) {
+        console.error('Error deleting messages:', messagesError);
+        // Continue with channel deletion even if messages fail
+      }
+
+      // Then delete the channel
       const { error } = await supabase
         .from('channels')
         .delete()
@@ -39,10 +51,11 @@ export const DeleteChannelDialog = ({
       if (error) throw error;
 
       toast.success(`Channel #${channelName} deleted`);
-      // Reset active channel and navigate to a safe route
+      
+      // Reset active channel and navigate to home
       setActiveChannel('');
       onOpenChange(false);
-      navigate('/');
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error deleting channel:', error);
       toast.error('Failed to delete channel');

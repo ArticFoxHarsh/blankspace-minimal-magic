@@ -10,11 +10,10 @@ import {
 } from '@/components/ui/tooltip';
 
 const navItems = [
-  { icon: Home, label: 'Home', path: '/' },
-  { icon: MessageSquare, label: 'DMs', path: '/dms' },
-  { icon: Bell, label: 'Activity', path: '/activity' },
-  { icon: Files, label: 'Files', path: '/files' },
-  { icon: MoreHorizontal, label: 'More', path: '/more' },
+  { icon: Home, label: 'Home', path: '/', showLabel: true },
+  { icon: MessageSquare, label: 'DMs', path: '/dms', showLabel: true },
+  { icon: Files, label: 'Files', path: '/files', showLabel: true },
+  { icon: MoreHorizontal, label: 'More', path: '/more', showLabel: true },
 ];
 
 export const MainSidebar = () => {
@@ -50,19 +49,26 @@ export const MainSidebar = () => {
         {navItems.map((item) => (
           <Tooltip key={item.path}>
             <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate(item.path)}
-                className={cn(
-                  'w-12 h-12 rounded-lg transition-colors',
-                  isActive(item.path)
-                    ? 'bg-[hsl(var(--slack-cyan))] text-foreground'
-                    : 'text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-foreground'
+              <div className="flex flex-col items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(item.path)}
+                  className={cn(
+                    'w-12 h-12 rounded-lg transition-colors',
+                    isActive(item.path)
+                      ? 'bg-[hsl(var(--slack-cyan))] text-foreground'
+                      : 'text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-foreground'
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                </Button>
+                {item.showLabel && (
+                  <span className="text-[10px] text-[hsl(var(--slack-text-muted))] font-medium">
+                    {item.label}
+                  </span>
                 )}
-              >
-                <item.icon className="h-5 w-5" />
-              </Button>
+              </div>
             </TooltipTrigger>
             <TooltipContent side="right">
               <p>{item.label}</p>

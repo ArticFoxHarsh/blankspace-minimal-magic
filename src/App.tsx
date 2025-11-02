@@ -4,9 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
-import { MessageArea } from "./components/MessageArea";
 import Auth from "./pages/Auth";
 import Index from "./pages/Index";
+import Channel from "./pages/Channel";
 import Threads from "./pages/Threads";
 import Activity from "./pages/Activity";
 import Starred from "./pages/Starred";
@@ -30,7 +30,7 @@ const ProtectedRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/c/:channelId" element={<MessageArea />} />
+      <Route path="/c/:channelId" element={<Channel />} />
       <Route path="/threads" element={<Threads />} />
       <Route path="/activity" element={<Activity />} />
       <Route path="/starred" element={<Starred />} />
