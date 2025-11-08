@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { SidebarHoverPanel } from './SidebarHoverPanel';
 import {
   Tooltip,
   TooltipContent,
@@ -11,16 +13,18 @@ import {
 } from '@/components/ui/tooltip';
 
 const navItems = [
-  { icon: Home, label: 'Home', path: '/', showLabel: true },
-  { icon: MessageSquare, label: 'DMs', path: '/dms', showLabel: true },
-  { icon: Files, label: 'Files', path: '/files', showLabel: true },
-  { icon: MoreHorizontal, label: 'More', path: '/more', showLabel: true },
+  { icon: Home, label: 'Home', path: '/', showLabel: true, hasPanel: false },
+  { icon: MessageSquare, label: 'DMs', path: '/dms', showLabel: true, hasPanel: true, panelType: 'dms' as const },
+  { icon: Files, label: 'Files', path: '/files', showLabel: true, hasPanel: true, panelType: 'files' as const },
+  { icon: MoreHorizontal, label: 'More', path: '/more', showLabel: true, hasPanel: true, panelType: 'more' as const },
 ];
 
 export const MainSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [openPanel, setOpenPanel] = useState<'dms' | 'activity' | 'files' | 'more' | null>(null);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -29,38 +33,54 @@ export const MainSidebar = () => {
     return location.pathname.startsWith(path);
   };
 
-  const getHoverContent = (label: string) => {
+  const handleMouseEnter = (label: string, panelType?: 'dms' | 'activity' | 'files' | 'more') => {
+    setHoveredItem(label);
+    
+    if (panelType) {
+      // Clear any existing timeout
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+      
+      // Set new timeout to show panel after delay
+      const timeout = setTimeout(() => {
+        setOpenPanel(panelType);
+      }, 200);
+      
+      setHoverTimeout(timeout);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredItem(null);
+    
+    // Clear timeout if mouse leaves before panel opens
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+  };
+
+  const handlePanelClose = () => {
+    setOpenPanel(null);
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+  };
+
+  const getSimpleTooltip = (label: string) => {
     switch (label) {
       case 'Home':
-        return (
-          <div className="p-2 min-w-[200px]">
-            <div className="font-bold text-sm mb-2">Home</div>
-            <div className="text-xs text-muted-foreground mb-2">View all channels and messages</div>
-          </div>
-        );
+        return 'Home - View all channels';
       case 'DMs':
-        return (
-          <div className="p-2 min-w-[200px]">
-            <div className="font-bold text-sm mb-2">Direct Messages</div>
-            <div className="text-xs text-muted-foreground mb-2">Private 1-on-1 conversations</div>
-          </div>
-        );
+        return 'Direct Messages';
       case 'Files':
-        return (
-          <div className="p-2 min-w-[200px]">
-            <div className="font-bold text-sm mb-2">Files</div>
-            <div className="text-xs text-muted-foreground mb-2">Browse shared files and documents</div>
-          </div>
-        );
+        return 'Files';
       case 'More':
-        return (
-          <div className="p-2 min-w-[200px]">
-            <div className="font-bold text-sm mb-2">More</div>
-            <div className="text-xs text-muted-foreground mb-2">Additional workspace tools</div>
-          </div>
-        );
+        return 'More';
       default:
-        return null;
+        return label;
     }
   };
 
@@ -84,37 +104,56 @@ export const MainSidebar = () => {
 
         {/* Navigation Items */}
         {navItems.map((item) => (
-          <Tooltip key={item.path}>
-            <TooltipTrigger asChild>
-              <div 
-                className="flex flex-col items-center gap-1"
-                onMouseEnter={() => setHoveredItem(item.label)}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(item.path)}
-                  className={cn(
-                    'w-12 h-12 rounded-lg transition-colors',
-                    isActive(item.path)
-                      ? 'bg-[hsl(var(--slack-cyan))] text-foreground'
-                      : 'text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-foreground'
-                  )}
+          <div key={item.path} className="relative">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div 
+                  className="flex flex-col items-center gap-1"
+                  onMouseEnter={() => handleMouseEnter(item.label, item.hasPanel ? item.panelType : undefined)}
+                  onMouseLeave={handleMouseLeave}
                 >
-                  <item.icon className="h-5 w-5" />
-                </Button>
-                {item.showLabel && (
-                  <span className="text-xs text-[hsl(var(--slack-text-muted))] font-bold">
-                    {item.label}
-                  </span>
-                )}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="bg-popover border-border p-0">
-              {getHoverContent(item.label)}
-            </TooltipContent>
-          </Tooltip>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      navigate(item.path);
+                      if (item.hasPanel && item.panelType) {
+                        setOpenPanel(openPanel === item.panelType ? null : item.panelType);
+                      }
+                    }}
+                    className={cn(
+                      'w-12 h-12 rounded-lg transition-colors',
+                      isActive(item.path)
+                        ? 'bg-[hsl(var(--slack-cyan))] text-foreground'
+                        : 'text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-foreground'
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                  </Button>
+                  {item.showLabel && (
+                    <span className="text-xs text-[hsl(var(--slack-text-muted))] font-bold">
+                      {item.label}
+                    </span>
+                  )}
+                </div>
+              </TooltipTrigger>
+              {!item.hasPanel && (
+                <TooltipContent side="right" className="bg-popover border-border">
+                  {getSimpleTooltip(item.label)}
+                </TooltipContent>
+              )}
+            </Tooltip>
+
+            {/* Hover Panel */}
+            <AnimatePresence>
+              {item.hasPanel && openPanel === item.panelType && (
+                <SidebarHoverPanel
+                  type={item.panelType}
+                  onClose={handlePanelClose}
+                />
+              )}
+            </AnimatePresence>
+          </div>
         ))}
       </TooltipProvider>
     </aside>

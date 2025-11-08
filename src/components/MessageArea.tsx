@@ -290,16 +290,16 @@ export const MessageArea = () => {
       </ScrollArea>
 
       {/* Message Input */}
-      <div className="p-5 border-t border-border flex-shrink-0">
+      <div className="p-5 border-t border-[#424242] flex-shrink-0 bg-background">
         <form onSubmit={handleSendMessage}>
-          <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div className="rounded-lg border border-[#424242] bg-[#1A1D21] overflow-hidden">
             {/* Formatting Toolbar */}
-            <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-border bg-muted/30">
+            <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-[#424242] bg-[#2C2D30]">
               <Button 
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => insertFormatting('**')}
                 title="Bold"
               >
@@ -309,7 +309,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => insertFormatting('_')}
                 title="Italic"
               >
@@ -319,7 +319,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => insertFormatting('~~')}
                 title="Strikethrough"
               >
@@ -329,7 +329,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => insertFormatting('[', '](url)')}
                 title="Link"
               >
@@ -339,7 +339,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   const lines = messageInput.split('\n');
                   const newText = lines.map((line, idx) => line.trim() ? `${idx + 1}. ${line}` : line).join('\n');
@@ -353,7 +353,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   const lines = messageInput.split('\n');
                   const newText = lines.map(line => line.trim() ? `• ${line}` : line).join('\n');
@@ -367,7 +367,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => insertFormatting('```\n', '\n```')}
                 title="Code block"
               >
@@ -377,7 +377,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => insertFormatting('`')}
                 title="Code"
               >
@@ -387,7 +387,7 @@ export const MessageArea = () => {
                 type="button" 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 hover:bg-muted"
+                className="h-7 w-7 hover:bg-[#424242] text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   const lines = messageInput.split('\n');
                   const newText = lines.map(line => line.trim() ? `> ${line}` : line).join('\n');
@@ -406,7 +406,7 @@ export const MessageArea = () => {
                 value={messageInput}
                 onChange={(e) => handleInputChange(e.target.value)}
                 placeholder={channel.type === 'dm' ? `Message @${channel.name}` : `Message #${channel.name}`}
-                className="w-full px-3 py-3 bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground resize-none min-h-[60px] max-h-[200px]"
+                className="w-full px-3 py-3 bg-[#1A1D21] border-none outline-none text-[15px] text-foreground placeholder:text-[#898989] resize-none min-h-[60px] max-h-[200px]"
                 onKeyDown={(e) => {
                   if (showMentions) {
                     if (e.key === 'ArrowDown') {
@@ -469,13 +469,13 @@ export const MessageArea = () => {
             </div>
 
             {/* Bottom Action Bar */}
-            <div className="flex items-center justify-between px-2 py-2 border-t border-border">
+            <div className="flex items-center justify-between px-2 py-2 border-t border-[#424242] bg-[#1A1D21]">
               <div className="flex items-center gap-1">
                 <Button 
                   type="button" 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 hover:bg-muted"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-[#2C2D30]"
                   onClick={() => document.getElementById('file-upload')?.click()}
                   title="Attach files"
                 >
@@ -496,7 +496,7 @@ export const MessageArea = () => {
                   type="button" 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 hover:bg-muted"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-[#2C2D30]"
                   title="Format"
                 >
                   <Type className="h-4 w-4" />
@@ -506,7 +506,7 @@ export const MessageArea = () => {
                   type="button" 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 hover:bg-muted"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-[#2C2D30]"
                   onClick={() => {
                     const cursorPos = inputRef.current?.selectionStart || 0;
                     const newText = messageInput.slice(0, cursorPos) + '@' + messageInput.slice(cursorPos);
@@ -524,7 +524,7 @@ export const MessageArea = () => {
                   type="button" 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 hover:bg-muted"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-[#2C2D30]"
                   title="Video message"
                 >
                   <Video className="h-4 w-4" />
@@ -533,7 +533,7 @@ export const MessageArea = () => {
                   type="button" 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 hover:bg-muted"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-[#2C2D30]"
                   title="Voice message"
                 >
                   <Mic className="h-4 w-4" />
@@ -549,7 +549,7 @@ export const MessageArea = () => {
                     <Button
                       type="submit"
                       size="icon"
-                      className="h-8 w-8 bg-[hsl(var(--slack-cyan))] hover:bg-[hsl(var(--slack-cyan-hover))] text-white rounded"
+                      className="h-8 w-8 bg-primary hover:bg-primary/90 rounded-lg"
                     >
                       <Send className="h-4 w-4" />
                     </Button>
