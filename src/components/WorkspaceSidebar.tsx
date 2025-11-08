@@ -88,7 +88,7 @@ const SortableChannelItem = ({
       className={cn(
         'w-full flex items-center gap-2 px-3 py-1 rounded text-[15px] group transition-all',
         isActive
-          ? 'bg-[hsl(var(--slack-cyan))] text-foreground font-bold'
+          ? 'bg-[hsl(var(--slack-purple-active))] text-foreground font-bold'
           : 'text-[hsl(var(--slack-text-secondary))] hover:bg-[hsl(var(--slack-purple-hover))]'
       )}
     >
@@ -225,6 +225,33 @@ export const WorkspaceSidebar = () => {
     return acc;
   }, {} as Record<string, typeof channels>);
 
+  // Add demo direct messages if none exist
+  if (!channelsBySection['Direct messages'] || channelsBySection['Direct messages'].length === 0) {
+    const demoDMs = [
+      {
+        id: 'demo-dm-1',
+        name: 'Abhimanyu Negi',
+        type: 'dm' as const,
+        section: 'Direct messages',
+        other_user: {
+          username: 'abhimanyu',
+          avatar_url: null
+        }
+      },
+      {
+        id: 'demo-dm-2',
+        name: `${profile?.display_name || profile?.username || 'You'} (you)`,
+        type: 'dm' as const,
+        section: 'Direct messages',
+        other_user: {
+          username: profile?.username || 'you',
+          avatar_url: profile?.avatar_url
+        }
+      }
+    ];
+    channelsBySection['Direct messages'] = demoDMs as any;
+  }
+
   // Apply custom ordering
   Object.keys(channelsBySection).forEach((section) => {
     if (channelOrder[section]) {
@@ -340,6 +367,20 @@ export const WorkspaceSidebar = () => {
 
           <div className="border-t border-[hsl(var(--slack-purple-active))] mb-3" />
 
+          <div className="mb-3">
+            <Button
+              variant="ghost"
+              className="w-full flex items-center justify-between px-3 py-1 text-[hsl(var(--slack-text-secondary))] hover:text-foreground text-xs font-bold h-auto"
+            >
+              <span>Starred</span>
+            </Button>
+            <div className="px-3 py-2 text-xs text-[hsl(var(--slack-text-muted))]">
+              Drag and drop important stuff here
+            </div>
+          </div>
+
+          <div className="border-t border-[hsl(var(--slack-purple-active))] mb-3" />
+
           {/* Sections */}
           {Object.entries(channelsBySection).map(([section, sectionChannels]) => (
             <div key={section} className="mb-3">
@@ -434,79 +475,6 @@ export const WorkspaceSidebar = () => {
         </div>
       </ScrollArea>
 
-      {/* User Profile */}
-      <div className="p-2 border-t border-[hsl(var(--slack-purple-active))]">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center gap-2.5 px-2 py-2 hover:bg-[hsl(var(--slack-purple-hover))] rounded transition-colors">
-              <div className="w-9 h-9 rounded bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-lg border border-primary/30 overflow-hidden">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  '👤'
-                )}
-              </div>
-              <div className="flex-1 text-left min-w-0">
-                <div className="font-black text-foreground text-[15px] truncate">
-                  {profile?.display_name || profile?.username || 'User'}
-                </div>
-                <div className="text-xs text-[hsl(var(--slack-text-muted))] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                  <span>Active</span>
-                </div>
-              </div>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
-            <div className="p-3 border-b border-border">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-xl border border-primary/30 overflow-hidden">
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    '👤'
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-sm truncate">
-                    {profile?.display_name || profile?.username || 'User'}
-                  </div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                    <span>Active</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <DropdownMenuItem className="flex items-center gap-2 p-3 cursor-pointer">
-              <span className="text-sm">😊</span>
-              <span className="text-sm">Update your status</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="p-3 cursor-pointer">
-              <span className="text-sm">Set yourself as away</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center justify-between p-3 cursor-pointer">
-              <span className="text-sm">Pause notifications</span>
-              <span className="text-xs text-muted-foreground">On</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="p-3 cursor-pointer">
-              <span className="text-sm">Profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="p-3 cursor-pointer">
-              <span className="text-sm">Preferences</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="p-3 cursor-pointer text-destructive focus:text-destructive"
-              onClick={signOut}
-            >
-              <span className="text-sm">Sign out of Debugging Demons</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
       
       <AddChannelDialog open={showAddChannel} onOpenChange={setShowAddChannel} />
       <AddDMDialog open={showAddDM} onOpenChange={setShowAddDM} />
