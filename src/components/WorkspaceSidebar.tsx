@@ -19,6 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   DndContext,
@@ -435,33 +436,76 @@ export const WorkspaceSidebar = () => {
 
       {/* User Profile */}
       <div className="p-2 border-t border-[hsl(var(--slack-purple-active))]">
-        <div className="flex items-center gap-2.5 px-2 py-2">
-          <div className="w-9 h-9 rounded bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-lg border border-primary/30 overflow-hidden">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              '👤'
-            )}
-          </div>
-          <div className="flex-1 text-left min-w-0">
-            <div className="font-black text-foreground text-[15px] truncate">
-              {profile?.display_name || profile?.username || 'User'}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="w-full flex items-center gap-2.5 px-2 py-2 hover:bg-[hsl(var(--slack-purple-hover))] rounded transition-colors">
+              <div className="w-9 h-9 rounded bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-lg border border-primary/30 overflow-hidden">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  '👤'
+                )}
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <div className="font-black text-foreground text-[15px] truncate">
+                  {profile?.display_name || profile?.username || 'User'}
+                </div>
+                <div className="text-xs text-[hsl(var(--slack-text-muted))] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                  <span>Active</span>
+                </div>
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
+            <div className="p-3 border-b border-border">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-xl border border-primary/30 overflow-hidden">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    '👤'
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-sm truncate">
+                    {profile?.display_name || profile?.username || 'User'}
+                  </div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span>Active</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="text-xs text-[hsl(var(--slack-text-muted))] flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span>
-              <span>Active</span>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 flex-shrink-0 text-[hsl(var(--slack-text-muted))] hover:text-foreground hover:bg-[hsl(var(--slack-purple-hover))]"
-            onClick={signOut}
-            title="Sign out"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
+            <DropdownMenuItem className="flex items-center gap-2 p-3 cursor-pointer">
+              <span className="text-sm">😊</span>
+              <span className="text-sm">Update your status</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="p-3 cursor-pointer">
+              <span className="text-sm">Set yourself as away</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="flex items-center justify-between p-3 cursor-pointer">
+              <span className="text-sm">Pause notifications</span>
+              <span className="text-xs text-muted-foreground">On</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="p-3 cursor-pointer">
+              <span className="text-sm">Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="p-3 cursor-pointer">
+              <span className="text-sm">Preferences</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              className="p-3 cursor-pointer text-destructive focus:text-destructive"
+              onClick={signOut}
+            >
+              <span className="text-sm">Sign out of Debugging Demons</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       
       <AddChannelDialog open={showAddChannel} onOpenChange={setShowAddChannel} />
