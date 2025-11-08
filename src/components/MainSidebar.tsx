@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Bell, Files, MoreHorizontal, Zap, User, Settings, LogOut, Smile } from 'lucide-react';
+import { Home, MessageCircle, Bell, Files, MoreHorizontal, User, Settings, LogOut, Smile } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,8 +24,8 @@ import {
 
 const navItems = [
   { icon: Home, label: 'Home', path: '/', showLabel: true, hasPanel: false },
-  { icon: MessageSquare, label: 'DMs', path: '/dms', showLabel: true, hasPanel: true, panelType: 'dms' as const },
-  { icon: Zap, label: 'Activity', path: '/activity', showLabel: true, hasPanel: true, panelType: 'activity' as const },
+  { icon: MessageCircle, label: 'DMs', path: '/dms', showLabel: true, hasPanel: true, panelType: 'dms' as const },
+  { icon: Bell, label: 'Activity', path: '/activity', showLabel: true, hasPanel: true, panelType: 'activity' as const },
   { icon: Files, label: 'Files', path: '/files', showLabel: true, hasPanel: true, panelType: 'files' as const },
   { icon: MoreHorizontal, label: 'More', path: '/more', showLabel: true, hasPanel: true, panelType: 'more' as const },
 ];
@@ -137,7 +137,7 @@ export const MainSidebar = () => {
                     className={cn(
                       'w-12 h-12 rounded-lg transition-colors',
                       isActive(item.path)
-                        ? 'bg-[hsl(var(--slack-cyan))] text-foreground'
+                        ? 'bg-[hsl(var(--slack-purple-active))] text-foreground hover:bg-[hsl(var(--slack-purple-hover))]'
                         : 'text-[hsl(var(--slack-text-muted))] hover:bg-[hsl(var(--slack-purple-hover))] hover:text-foreground'
                     )}
                   >
